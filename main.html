@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Streaming Response from FastAPI</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    #output { white-space: pre-wrap; background: #f4f4f4; padding: 10px; border-radius: 5px; }
+  </style>
+</head>
+<body>
+  <h1>FastAPI Streaming Output</h1>
+  <textarea id="prompt" placeholder="Enter your prompt" style="width: 300px;">Insert text here
+  </textarea>
+  <button onclick="sendPrompt()">Send</button>
+
+  <h2>Response:</h2>
+  <div id="output"></div>
+
+  <script>
+    async function sendPrompt() {
+      const output = document.getElementById("output");
+      const prompt = document.getElementById("prompt").value;
+      output.textContent = ""; // Clear previous output
+
+      const response = await fetch("http://localhost:8000/api/async_generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(
+        { prompt: prompt,
+          model: 'deepseek-coder-v2:16b'})
+      });
+
+      if (!response.ok || !response.body) {
+        output.textContent = "Error fetching response.";
+        return;
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder("utf-8");
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        const chunk = decoder.decode(value, { stream: true });
+        output.textContent += chunk;
+      }
+    }
+  </script>
+</body>
+</html>
