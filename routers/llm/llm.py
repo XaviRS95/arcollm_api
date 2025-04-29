@@ -14,10 +14,10 @@ async def list_models():
 
 @llm_router.post("/api/async_generate")
 async def async_generate(request: dict):
-    message = request['prompt']
+    messages = request['messages']
     model = request['model']
     async def event_stream():
-        async for chunk in ollama_async_client_request(message=message, model=model):
+        async for chunk in ollama_async_client_request(messages=messages, model=model):
             yield chunk
     return StreamingResponse(
         event_stream(),

@@ -1,17 +1,15 @@
 import json
-import ollama
 import requests
-import asyncio
 from config.config import OLLAMA_CONFIG
 from utils.ollamaclient import ASYNC_CLIENT, SYNC_CLIENT
 
-async def ollama_async_client_request(message: str, model: str):
-    message = {'role': 'user', 'content': message}
+async def ollama_async_client_request(messages: list, model: str):
     async for part in await ASYNC_CLIENT.chat(
             model=model,
-            messages=[message],
-            stream=True):
-        print(part['message']['content'], end='', flush=True)
+            messages=messages,
+            stream=True,
+            options={}
+    ):
         yield part['message']['content']
 
 

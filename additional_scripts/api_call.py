@@ -1,8 +1,6 @@
 import re
 import subprocess
-
 import requests
-
 
 API_SOCKET = "http://localhost:8000/api"
 
