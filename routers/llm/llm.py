@@ -1,35 +1,16 @@
-from fastapi import APIRouter, status, Request
-from fastapi.responses import JSONResponse
-from starlette.responses import StreamingResponse
+from fastapi import APIRouter
 from config.config import API_CONFIG
+from models.models import ChatRequest
 #from utils.decorators import execution_handler
-from responses.llm import ollama_async_client_request, ollama_model_list, ollama_sync_client_request
+from responses.llm import llm as llm_responses
 
 llm_router = APIRouter()
 
 @llm_router.get("/api/models_list")
 async def list_models():
-    response = await ollama_model_list()
+    response = llm_responses.ollama_model_list()
     return response
 
-@llm_router.post("/api/async_generate")
-async def async_generate(request: dict):
-    messages = request['messages']
-    model = request['model']
-    async def event_stream():
-        async for chunk in ollama_async_client_request(messages=messages, model=model):
-            yield chunk
-    return StreamingResponse(
-        event_stream(),
-        media_type="text/plain",
-        headers={'Transfer-Encoding': 'chunked'})
-
-@llm_router.post("/api/sync_generate")
-def sync_generate(request: dict):
-    message = request['prompt']
-    model = request['model']
-    code = ollama_sync_client_request(message=message, model=model)
-    return JSONResponse(
-        content=code,
-        status_code=status.HTTP_202_ACCEPTED
-    )
+@llm_router.post("/api/chat_request")
+async def chat_request(request: ChatRequest):
+    return await llm_responses.chat_request(request=request)
