@@ -13,7 +13,7 @@ import traceback
 
 logger = logging.getLogger(__name__)
 
-async def chat_request(request: ChatRequest):
+async def async_chat_request(request: ChatRequest):
     """
     Handles a streaming chat request using an asynchronous language model client.
 

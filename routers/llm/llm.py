@@ -11,6 +11,6 @@ async def list_models():
     response = llm_responses.ollama_model_list()
     return response
 
-@llm_router.post("/api/chat_request")
+@llm_router.post("/api/async_chat_request")
 async def chat_request(request: ChatRequest):
-    return await llm_responses.chat_request(request=request)
+    return await llm_responses.async_chat_request(request=request)
