@@ -23,7 +23,7 @@ async def async_chat_request(request: ChatRequest):
         StreamingResponse: A FastAPI streaming response that yields partial responses
                            from the language model in real time with appropriate headers.
     """
-    if request.message is None and request.messages is None:
+    if request.messages is None:
         return JSONResponse(
             content= {"detail": "No message from user was sent"},
             media_type="application/json",
