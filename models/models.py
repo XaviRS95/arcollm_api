@@ -13,7 +13,6 @@ class CreateConversationRequest(BaseModel):
     model: str
 
 class ChatRequest(BaseModel):
-    messages: Optional[List[ChatMessage]] = None
-    message: Optional[ChatMessage] = None
+    messages: Optional[List[ChatMessage]]
     options: dict
     model: str

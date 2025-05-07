@@ -12,5 +12,5 @@ CONFIG = ConfigObj(os.path.join(BASE, 'config.cfg'))
 API_CONFIG = CONFIG['api']        # API-related configuration (e.g., host, port)
 JWT_CONFIG = CONFIG['jwt']        # JWT settings (e.g., secret key, expiration)
 LOG_CONFIG = CONFIG['log']        # Logging configuration (e.g., level, file path)
-MONGO_CONFIG = CONFIG['mongo']    # MongoDB connection configuration (e.g., URI, database name)
+MYSQL_CONFIG = CONFIG['mysql']    # MongoDB connection configuration (e.g., URI, database name)
 OLLAMA_CONFIG = CONFIG['ollama']
