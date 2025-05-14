@@ -1,17 +1,19 @@
 import aiomysql
 from config.config import MYSQL_CONFIG
 
-def build_url_connection(MYSQL_CONFIG) -> str:
-    uri = ''
-    return uri
-
 class MySQLReadWriteConnector:
     def __init__(self):
-        self.url = build_url_connection(MYSQL_CONFIG=MYSQL_CONFIG)
-        self.connect = aiomysql.connect(
+        self.connect = None
+
+    async def start_connection(self):
+        self.connect = await aiomysql.connect(
             host=MYSQL_CONFIG['host'],
             user=MYSQL_CONFIG['readwriteuser'],
             password=MYSQL_CONFIG['readwriteuserpasswd'],
             db=MYSQL_CONFIG['db'],
-            port=MYSQL_CONFIG['port']
+            port=int(MYSQL_CONFIG['port'])
         )
+
+    async def close_connection(self):
+        if self.connect is not None:
+            self.connect.close()

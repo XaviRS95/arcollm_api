@@ -9,6 +9,7 @@ import asyncio
 import logging
 import httpx
 import traceback
+from database.mysql import mysql
 
 
 async def async_chat_request(request: ChatRequest):
@@ -125,3 +126,22 @@ def ollama_model_list():
         status_code=status.HTTP_200_OK,
         content={"models": models}
     )
+
+
+async def get_available_models_list():
+    try:
+        models = await mysql.get_available_models_list()
+        content = None
+        if len(models) != 0:
+            content = {'models': models}
+        else:
+            return JSONResponse(
+                content=content,
+                status_code=status.HTTP_200_OK
+            )
+
+    except Exception as e:
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={"error": str(e)}
+        )

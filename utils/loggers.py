@@ -17,5 +17,6 @@ def generate_logger(name: str, logging_type: int, message_format: str):
 
     return logger
 
-endpoint_info_logger = generate_logger(name='api_logger_info', logging_type=logging.DEBUG, message_format="%(message)s")
-endpoint_error_logger = generate_logger(name='api_logger_error', logging_type=logging.ERROR, message_format="%(message)s")
+api_info_logger = generate_logger(name='api_info_logger', logging_type=logging.DEBUG, message_format="%(message)s")
+api_error_logger = generate_logger(name='api_error_logger', logging_type=logging.ERROR, message_format="%(message)s")
+mysql_error_logger = generate_logger(name='mysql_error_logger', logging_type=logging.ERROR, message_format="%(message)s")

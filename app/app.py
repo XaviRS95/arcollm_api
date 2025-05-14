@@ -6,14 +6,18 @@ from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from config.config import API_CONFIG
 from routers.llm.llm import llm_router
+from routers.conversations.conversations import conversations_router
 from routers.metadata.metadata import metadata_router
-from utils.loggers import endpoint_info_logger, endpoint_error_logger
+from utils.loggers import api_info_logger, api_error_logger
 
 app = FastAPI(title=API_CONFIG['name'])
 
 #ROUTERS:
+app.include_router(conversations_router)
 app.include_router(llm_router)
 app.include_router(metadata_router)
+
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -41,7 +45,7 @@ async def unhandled_exception_handler(request: Request, exc: Exception):
         file_name = function_name = "unknown"
         line_number = -1
 
-    endpoint_error_logger.error({
+    api_error_logger.error({
         "date": datetime.now(timezone.utc).isoformat(),
         "endpoint": func_name,
         "origin": {
@@ -75,7 +79,7 @@ async def log_request_data(request: Request, call_next):
             "status_code": response.status_code,
             "execution_time_ms": execution_time
         }
-        endpoint_info_logger.debug(log_data)
+        api_info_logger.debug(log_data)
         return response
     except HTTPException as http_exc:
         func_name = request.scope.get("endpoint", None)
@@ -84,7 +88,7 @@ async def log_request_data(request: Request, call_next):
         # Get a simplified error trace (only exception type and message)
         error_trace = str(http_exc)
 
-        endpoint_error_logger.error({
+        api_error_logger.error({
             "date": datetime.now(timezone.utc).isoformat(),
             "url": str(request.url),
             "status_code": http_exc.status_code,

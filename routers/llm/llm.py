@@ -11,6 +11,11 @@ def list_models():
     response = llm_responses.ollama_model_list()
     return response
 
+@llm_router.get("/api/sql_models_list")
+async def list_models():
+    response = await llm_responses.get_available_models_list()
+    return response
+
 @llm_router.post("/api/async_chat_request")
 async def async_chat_request(request: ChatRequest):
     return await llm_responses.async_chat_request(request=request)
@@ -18,3 +23,4 @@ async def async_chat_request(request: ChatRequest):
 @llm_router.post("/api/sync_chat_request")
 def sync_chat_request(request: ChatRequest):
     return llm_responses.sync_chat_request(request=request)
+

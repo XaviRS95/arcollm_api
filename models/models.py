@@ -8,11 +8,11 @@ class ChatMessage(BaseModel):
     role: Literal["user", "assistant", "system"]
 
 class CreateConversationRequest(BaseModel):
-    email: str
-    messages: List[ChatMessage]
-    model: str
+    title: str
+    user_mail: str
 
 class ChatRequest(BaseModel):
     messages: Optional[List[ChatMessage]]
     options: dict
     model: str
+
