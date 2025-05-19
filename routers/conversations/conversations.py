@@ -5,7 +5,6 @@ from models.models import CreateConversationRequest
 #from utils.decorators import execution_handler
 from responses.conversations import conversations
 
-
 conversations_router = APIRouter()
 
 @conversations_router.get('/api/user_conversations/{user_email}')
@@ -22,7 +21,4 @@ async def get_full_conversation(conversation_id: str):
 async def create_conversation(request: CreateConversationRequest):
     response = await conversations.create_conversation(request = request)
     return response
-
-
-
 

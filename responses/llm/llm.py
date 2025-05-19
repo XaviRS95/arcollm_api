@@ -1,14 +1,9 @@
-import json
-import requests
+import json, requests, uuid
 from config.config import OLLAMA_CONFIG
-from models.models import ChatRequest
+from models.models import ChatRequest, CreateConversationRequest, CreateMessageRequest
 from utils.ollamaclient import ASYNC_CLIENT, SYNC_CLIENT
 from fastapi import status
 from starlette.responses import StreamingResponse, JSONResponse
-import asyncio
-import logging
-import httpx
-import traceback
 from database.mysql import mysql
 
 
@@ -24,12 +19,46 @@ async def async_chat_request(request: ChatRequest):
         StreamingResponse: A FastAPI streaming response that yields partial responses
                            from the language model in real time with appropriate headers.
     """
+
     if request.messages is None:
         return JSONResponse(
             content= {"detail": "No message from user was sent"},
             media_type="application/json",
             status_code = status.HTTP_400_BAD_REQUEST
         )
+
+    #If this is the 1st message sent and there is no conversation_id yet, it will create a new conversation.
+    if request.conversation_id is None:
+        create_conversation_request = CreateConversationRequest(
+            title = 'Conversation 1',
+            user_mail = request.user_mail,
+            model = request.model)
+        conversation_id = await mysql.create_conversation(request=create_conversation_request)
+        #If it wasn't possible to generate a conversation, the message generation is stopped.
+        if conversation_id is None:
+            return JSONResponse(
+                content={"error": "Unable to generate conversation"},
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        else:
+            request.conversation_id = conversation_id
+
+    message = request.messages[-1]
+
+    create_message_request = CreateMessageRequest(
+    conversation_id = request.conversation_id,
+    role = message['role'],
+    content = message['content'],
+    user_mail = request.user_mail
+    )
+
+    message_uuid = await mysql.create_message_conversation(request=create_message_request)
+    if message_uuid is not None:
+        return JSONResponse(
+            content={"error": "Unable to generate message"},
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
 
     async def event_stream():
         """
@@ -45,9 +74,15 @@ async def async_chat_request(request: ChatRequest):
             stream=True,
             options=request.options
         )
+        generated_message = ""
+
         # Iterate over the streamed parts and yield their content
         async for part in stream:
-            yield part['message']['content']
+            token = part['message']['content']
+            generated_message += token
+            yield token
+
+        print(generated_message)
 
     # Return the event stream as a FastAPI StreamingResponse with appropriate headers
     return StreamingResponse(
