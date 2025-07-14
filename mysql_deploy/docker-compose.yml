@@ -1,0 +1,19 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql_container
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: y}f%Jizo-T6XD6.dAn]A+w=YvMTyhQ
+      MYSQL_DATABASE: arcollm
+      MYSQL_USER: arcollm_admin
+      MYSQL_PASSWORD: jpZ,*7dx-JY}g#M8:xn0LaL^)v_wit
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:
+    name: mysql_volume
+

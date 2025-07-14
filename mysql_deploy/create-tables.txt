@@ -1,0 +1,46 @@
+--Connect to MySQL Docker 
+docker exec -it mysql_container mysql -uroot -p
+
+-- Ensure the arcollm database exists
+CREATE DATABASE IF NOT EXISTS arcollm;
+
+-- Use the arcollm database
+USE arcollm;
+
+-- Create the 'users' table
+CREATE TABLE IF NOT EXISTS users (
+    mail VARCHAR(255) PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    pass VARCHAR(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Create the 'models' table
+CREATE TABLE IF NOT EXISTS models (
+    name VARCHAR(255)PRIMARY KEY,
+    is_available CHAR(1) NOT NULL,
+    user_mail VARCHAR(255),
+    FOREIGN KEY (user_mail) REFERENCES users(mail) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Create the 'conversations' table
+CREATE TABLE IF NOT EXISTS conversations (
+    conversation_id VARCHAR(255) PRIMARY KEY,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    title VARCHAR(255) NOT NULL,
+    user_mail VARCHAR(255) NOT NULL,
+    model_name VARCHAR(255),
+    FOREIGN KEY (user_mail) REFERENCES users(mail) ON DELETE CASCADE,
+    FOREIGN KEY (model_name) REFERENCES models(name) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Create the 'messages' table
+CREATE TABLE IF NOT EXISTS messages (
+    message_id VARCHAR(255) PRIMARY KEY,
+    conversation_id VARCHAR(255),
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    role VARCHAR(50) NOT NULL,
+    content TEXT NOT NULL,
+    user_mail VARCHAR(255),
+    FOREIGN KEY (conversation_id) REFERENCES conversations(conversation_id) ON DELETE CASCADE,
+    FOREIGN KEY (user_mail) REFERENCES users(mail) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
